@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - HungryBird</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>HungryBird Admin</h1>
+      <nav>
+        <a href="index.html">Courses</a>
+        <button onclick="logout()" class="btn-danger">Logout</button>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <div id="loginContainer" class="section" style="max-width: 450px; margin: 50px auto;">
+      <h2>Admin Login</h2>
+      <p style="margin-bottom: 20px;">Enter your admin credentials to access the dashboard.</p>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="adminUsername">Username</label>
+          <input type="text" id="adminUsername" name="username" required placeholder="admin@123">
+        </div>
+
+        <div class="form-group">
+          <label for="adminPassword">Password</label>
+          <input type="password" id="adminPassword" name="password" required placeholder="admin@123">
+        </div>
+
+        <button type="submit" class="btn" style="width: 100%;">Login</button>
+      </form>
+    </div>
+
+    <div id="dashboardContainer" style="display: none;">
+      <div id="alertContainer"></div>
+
+      <!-- TAB NAVIGATION -->
+      <div class="section">
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <button onclick="switchTab('instructors')" class="btn" id="btnInstructors">Instructors</button>
+          <button onclick="switchTab('courses')" class="btn btn-secondary" id="btnCourses">Courses</button>
+          <button onclick="switchTab('lessons')" class="btn btn-secondary" id="btnLessons">Lessons</button>
+        </div>
+      </div>
+
+      <!-- INSTRUCTORS TAB -->
+      <div id="instructorsTab" class="section">
+        <h2>Instructor Management</h2>
+
+        <div style="margin-bottom: 25px;">
+          <h3 style="color: #A5B68D; margin-bottom: 15px;">Pending Approvals</h3>
+          <div id="pendingInstructorsList" class="list-container"></div>
+          <div id="noPendingInstructors" style="display: none;" class="empty-state">
+            <p>No pending instructor registrations.</p>
+          </div>
+        </div>
+
+        <hr style="border: none; border-top: 1px solid rgba(165, 182, 141, 0.2); margin: 25px 0;">
+
+        <div>
+          <h3 style="color: #A5B68D; margin-bottom: 15px;">Approved Instructors</h3>
+          <div id="approvedInstructorsList" class="list-container"></div>
+          <div id="noApprovedInstructors" style="display: none;" class="empty-state">
+            <p>No approved instructors yet.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- COURSES TAB -->
+      <div id="coursesTab" class="section" style="display: none;">
+        <h2>Course Management</h2>
+
+        <div style="margin-bottom: 25px; background: rgba(165, 182, 141, 0.08); padding: 20px; border-radius: 8px; border: 1px solid rgba(165, 182, 141, 0.15);">
+          <h3 style="margin-bottom: 15px;">Add New Course</h3>
+          <form id="addCourseForm">
+            <div class="form-group">
+              <label for="courseName">Course Name</label>
+              <input type="text" id="courseName" name="courseName" required placeholder="Enter course name">
+            </div>
+
+            <div class="form-group">
+              <label for="courseInstructor">Assign Instructor</label>
+              <select id="courseInstructor" name="courseInstructor" required>
+                <option value="">-- Select an Instructor --</option>
+              </select>
+            </div>
+
+            <button type="submit" class="btn">Create Course</button>
+          </form>
+        </div>
+
+        <hr style="border: none; border-top: 1px solid rgba(165, 182, 141, 0.2); margin: 25px 0;">
+
+        <h3 style="margin-bottom: 15px;">All Courses</h3>
+        <div id="coursesList" class="list-container"></div>
+        <div id="noCourses" style="display: none;" class="empty-state">
+          <p>No courses created yet.</p>
+        </div>
+      </div>
+
+      <!-- LESSONS TAB -->
+      <div id="lessonsTab" class="section" style="display: none;">
+        <h2>Lesson Management</h2>
+
+        <div style="margin-bottom: 20px; background: rgba(165, 182, 141, 0.08); padding: 20px; border-radius: 8px; border: 1px solid rgba(165, 182, 141, 0.15);">
+          <h3 style="margin-bottom: 12px;">Select a Course</h3>
+          <div class="form-group">
+            <select id="lessonCourseSelect" name="lessonCourse">
+              <option value="">-- Select a Course --</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="lessonFormContainer" style="display: none; margin-bottom: 25px; background: rgba(165, 182, 141, 0.08); padding: 20px; border-radius: 8px; border: 1px solid rgba(165, 182, 141, 0.15);">
+          <h3 style="margin-bottom: 15px;">Add New Lesson</h3>
+          <form id="addLessonForm">
+            <div class="form-group">
+              <label for="lessonName">Lesson Name</label>
+              <input type="text" id="lessonName" name="lessonName" required placeholder="Enter lesson name">
+            </div>
+
+            <button type="submit" class="btn">Create Lesson</button>
+          </form>
+        </div>
+
+        <hr style="border: none; border-top: 1px solid rgba(165, 182, 141, 0.2); margin: 25px 0;">
+
+        <h3 id="lessonsHeading" style="margin-bottom: 15px;">Lessons</h3>
+        <div id="lessonsList" class="list-container"></div>
+        <div id="noLessons" style="display: none;" class="empty-state">
+          <p>No lessons in this course or no course selected.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2025 HungryBird Course Management. Made with care.</p>
+  </footer>
+
+  <!-- EDIT COURSE MODAL -->
+  <div id="editCourseModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Edit Course</h2>
+        <button class="close-btn" onclick="closeModal('editCourseModal')">×</button>
+      </div>
+      <form id="editCourseForm">
+        <input type="hidden" id="editCourseId">
+        <div class="form-group">
+          <label for="editCourseName">Course Name</label>
+          <input type="text" id="editCourseName" required>
+        </div>
+        <div class="form-group">
+          <label for="editCourseInstructor">Instructor</label>
+          <select id="editCourseInstructor" required></select>
+        </div>
+        <button type="submit" class="btn">Update Course</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- EDIT LESSON MODAL -->
+  <div id="editLessonModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Edit Lesson</h2>
+        <button class="close-btn" onclick="closeModal('editLessonModal')">×</button>
+      </div>
+      <form id="editLessonForm">
+        <input type="hidden" id="editLessonId">
+        <input type="hidden" id="editLessonCourseId">
+        <div class="form-group">
+          <label for="editLessonName">Lesson Name</label>
+          <input type="text" id="editLessonName" required>
+        </div>
+        <button type="submit" class="btn">Update Lesson</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script>
+    // admin credentials for MVP
+    const ADMIN_USERNAME = 'admin@123';
+    const ADMIN_PASSWORD = 'admin@123';
+
+    let currentCourseIdForLessons = null;
+    let isLoggedIn = false;
+
+    // show alert message
+    function showAlert(message, type = 'success') {
+      const container = document.getElementById('alertContainer');
+      const alert = document.createElement('div');
+      alert.className = `alert alert-${type} show`;
+      alert.textContent = message;
+      container.innerHTML = '';
+      container.appendChild(alert);
+      setTimeout(() => alert.remove(), 4000);
+    }
+
+    // login handler
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const username = document.getElementById('adminUsername').value;
+      const password = document.getElementById('adminPassword').value;
+
+      if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+        isLoggedIn = true;
+        sessionStorage.setItem('adminLoggedIn', 'true');
+        document.getElementById('loginContainer').style.display = 'none';
+        document.getElementById('dashboardContainer').style.display = 'block';
+        loadInstructorData();
+        loadCoursesData();
+      } else {
+        showAlert('Invalid credentials', 'danger');
+      }
+    });
+
+    // logout handler
+    function logout() {
+      isLoggedIn = false;
+      sessionStorage.removeItem('adminLoggedIn');
+      document.getElementById('dashboardContainer').style.display = 'none';
+      document.getElementById('loginContainer').style.display = 'block';
+      document.getElementById('loginForm').reset();
+    }
+
+    // check if already logged in
+    window.addEventListener('DOMContentLoaded', () => {
+      if (sessionStorage.getItem('adminLoggedIn')) {
+        isLoggedIn = true;
+        document.getElementById('loginContainer').style.display = 'none';
+        document.getElementById('dashboardContainer').style.display = 'block';
+        loadInstructorData();
+        loadCoursesData();
+      }
+    });
+
+    // switch between tabs
+    function switchTab(tab) {
+      document.getElementById('instructorsTab').style.display = tab === 'instructors' ? 'block' : 'none';
+      document.getElementById('coursesTab').style.display = tab === 'courses' ? 'block' : 'none';
+      document.getElementById('lessonsTab').style.display = tab === 'lessons' ? 'block' : 'none';
+
+      document.getElementById('btnInstructors').className = tab === 'instructors' ? 'btn' : 'btn btn-secondary';
+      document.getElementById('btnCourses').className = tab === 'courses' ? 'btn' : 'btn btn-secondary';
+      document.getElementById('btnLessons').className = tab === 'lessons' ? 'btn' : 'btn btn-secondary';
+
+      // Load courses when switching to lessons tab
+      if (tab === 'lessons') {
+        loadLessonsCourses();
+      }
+    }
+
+    async function loadLessonsCourses() {
+      const courses = await getAllCoursesAdmin();
+      const lessonCourseSelect = document.getElementById('lessonCourseSelect');
+      lessonCourseSelect.innerHTML = '<option value="">-- Select a Course --</option>' + 
+        courses.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+    }
+
+    // ==================== INSTRUCTORS TAB ====================
+    async function loadInstructorData() {
+      const pending = await getPendingInstructors();
+      const approved = await getApprovedInstructors();
+
+      const pendingList = document.getElementById('pendingInstructorsList');
+      const approvedList = document.getElementById('approvedInstructorsList');
+
+      if (pending.length === 0) {
+        document.getElementById('noPendingInstructors').style.display = 'block';
+        pendingList.innerHTML = '';
+      } else {
+        document.getElementById('noPendingInstructors').style.display = 'none';
+        pendingList.innerHTML = pending.map(inst => `
+          <div class="card">
+            <h3>${inst.name}</h3>
+            <p><strong>Email:</strong> ${inst.email}</p>
+            <p><strong>Status:</strong> <span class="badge pending">Pending</span></p>
+            <div class="btn-group">
+              <button onclick="approveInstructorBtn(${inst.id})" class="btn btn-success btn-small">Approve</button>
+              <button onclick="deleteInstructorBtn(${inst.id})" class="btn btn-danger btn-small">Delete</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      if (approved.length === 0) {
+        document.getElementById('noApprovedInstructors').style.display = 'block';
+        approvedList.innerHTML = '';
+      } else {
+        document.getElementById('noApprovedInstructors').style.display = 'none';
+        approvedList.innerHTML = approved.map(inst => `
+          <div class="card">
+            <h3>${inst.name}</h3>
+            <p><strong>Email:</strong> ${inst.email}</p>
+            <p><strong>Status:</strong> <span class="badge approved">Approved</span></p>
+            <button onclick="deleteInstructorBtn(${inst.id})" class="btn btn-danger btn-small">Delete</button>
+          </div>
+        `).join('');
+      }
+
+      // update course instructor selects
+      const courseInstructor = document.getElementById('courseInstructor');
+      const editCourseInstructor = document.getElementById('editCourseInstructor');
+      const options = approved.map(inst => `<option value="${inst.id}">${inst.name}</option>`).join('');
+      courseInstructor.innerHTML = '<option value="">-- Select an Instructor --</option>' + options;
+      editCourseInstructor.innerHTML = options;
+    }
+
+    async function approveInstructorBtn(instructorId) {
+      await approveInstructor(instructorId);
+      loadInstructorData();
+    }
+
+    async function deleteInstructorBtn(instructorId) {
+      if (confirm('Delete this instructor? All their courses will also be deleted.')) {
+        const result = await deleteInstructor(instructorId);
+        if (result.success) {
+          await loadInstructorData();
+          await loadCoursesData();
+        }
+      }
+    }
+
+    // ==================== COURSES TAB ====================
+    async function loadCoursesData() {
+      const courses = await getAllCoursesAdmin();
+      const coursesList = document.getElementById('coursesList');
+
+      if (courses.length === 0) {
+        document.getElementById('noCourses').style.display = 'block';
+        coursesList.innerHTML = '';
+      } else {
+        document.getElementById('noCourses').style.display = 'none';
+        coursesList.innerHTML = courses.map(course => `
+          <div class="card">
+            <h3>${course.name}</h3>
+            <p><strong>Instructor:</strong> ${course.Instructor?.name || 'N/A'}</p>
+            <div class="btn-group">
+              <button onclick="editCourseModal(${course.id}, '${course.name}', ${course.instructorId})" class="btn btn-small">Edit</button>
+              <button onclick="deleteCourseBtn(${course.id})" class="btn btn-danger btn-small">Delete</button>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    document.getElementById('addCourseForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('courseName').value.trim();
+      const instructorId = document.getElementById('courseInstructor').value;
+
+      if (!name || !instructorId) {
+        showAlert('Please fill in all fields', 'danger');
+        return;
+      }
+
+      const result = await createCourse(name, instructorId);
+      if (result && result.success) {
+        showAlert('Course created successfully');
+        document.getElementById('addCourseForm').reset();
+        loadCoursesData();
+        loadInstructorData();
+      }
+    });
+
+    function editCourseModal(courseId, courseName, instructorId) {
+      document.getElementById('editCourseId').value = courseId;
+      document.getElementById('editCourseName').value = courseName;
+      document.getElementById('editCourseInstructor').value = instructorId;
+      document.getElementById('editCourseModal').classList.add('show');
+    }
+
+    document.getElementById('editCourseForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const courseId = document.getElementById('editCourseId').value;
+      const name = document.getElementById('editCourseName').value;
+      const instructorId = document.getElementById('editCourseInstructor').value;
+
+      const result = await updateCourse(courseId, name, instructorId);
+      if (result && result.success) {
+        showAlert('Course updated successfully');
+        closeModal('editCourseModal');
+        loadCoursesData();
+        loadInstructorData();
+      }
+    });
+
+    async function deleteCourseBtn(courseId) {
+      if (confirm('Delete this course? All lessons will also be deleted.')) {
+        await deleteCourse(courseId);
+        showAlert('Course deleted');
+        loadCoursesData();
+        loadInstructorData();
+      }
+    }
+
+    // ==================== LESSONS TAB ====================
+    document.getElementById('lessonCourseSelect').addEventListener('change', async (e) => {
+      const courseId = e.target.value;
+
+      if (courseId) {
+        currentCourseIdForLessons = courseId;
+        document.getElementById('lessonFormContainer').style.display = 'block';
+        document.getElementById('lessonsHeading').textContent = `Lessons for Course #${courseId}`;
+        await loadLessonsForCourse(courseId);
+      } else {
+        currentCourseIdForLessons = null;
+        document.getElementById('lessonFormContainer').style.display = 'none';
+        document.getElementById('lessonsList').innerHTML = '';
+        document.getElementById('noLessons').style.display = 'block';
+      }
+    });
+
+    async function loadLessonsForCourse(courseId) {
+      const lessons = await getCourseLessons(courseId);
+      const lessonsList = document.getElementById('lessonsList');
+
+      if (lessons.length === 0) {
+        document.getElementById('noLessons').style.display = 'block';
+        lessonsList.innerHTML = '';
+      } else {
+        document.getElementById('noLessons').style.display = 'none';
+        lessonsList.innerHTML = lessons.map(lesson => `
+          <div class="card">
+            <h3>${lesson.name}</h3>
+            <p><strong>ID:</strong> ${lesson.id}</p>
+            <div class="btn-group">
+              <button onclick="editLessonModal(${lesson.id}, '${lesson.name}', ${courseId})" class="btn btn-small">Edit</button>
+              <button onclick="deleteLessonBtn(${courseId}, ${lesson.id})" class="btn btn-danger btn-small">Delete</button>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    document.getElementById('addLessonForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      if (!currentCourseIdForLessons) {
+        showAlert('Please select a course first', 'danger');
+        return;
+      }
+
+      const title = document.getElementById('lessonName').value.trim();
+
+      if (!title) {
+        showAlert('Please enter a lesson name', 'danger');
+        return;
+      }
+
+      const result = await createLesson(currentCourseIdForLessons, title);
+      if (result && result.success) {
+        showAlert('Lesson created');
+        document.getElementById('addLessonForm').reset();
+        await loadLessonsForCourse(currentCourseIdForLessons);
+      }
+    });
+
+    function editLessonModal(lessonId, lessonTitle, courseId) {
+      document.getElementById('editLessonId').value = lessonId;
+      document.getElementById('editLessonName').value = lessonTitle;
+      document.getElementById('editLessonCourseId').value = courseId;
+      document.getElementById('editLessonModal').classList.add('show');
+    }
+
+    document.getElementById('editLessonForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const lessonId = document.getElementById('editLessonId').value;
+      const courseId = document.getElementById('editLessonCourseId').value;
+      const title = document.getElementById('editLessonName').value;
+
+      const result = await updateLesson(courseId, lessonId, title);
+      if (result && result.success) {
+        showAlert('Lesson updated');
+        closeModal('editLessonModal');
+        await loadLessonsForCourse(courseId);
+      }
+    });
+
+    async function deleteLessonBtn(courseId, lessonId) {
+      if (confirm('Delete this lesson?')) {
+        await deleteLesson(courseId, lessonId);
+        showAlert('Lesson deleted');
+        await loadLessonsForCourse(courseId);
+      }
+    }
+
+    // modal helpers
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('show');
+    }
+
+    window.addEventListener('click', (e) => {
+      const modals = document.querySelectorAll('.modal.show');
+      modals.forEach(modal => {
+        if (e.target === modal) {
+          modal.classList.remove('show');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

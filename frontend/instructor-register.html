@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Become an Instructor - HungryBird</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>HungryBird</h1>
+      <nav>
+        <a href="index.html">Courses</a>
+        <a href="instructor-register.html">Instructor</a>
+        <a href="admin.html">Admin</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="section" style="max-width: 500px; margin: 50px auto;">
+      <h2>Become an Instructor</h2>
+      <p>Join our community of educators and share your knowledge with learners worldwide.</p>
+
+      <form id="registrationForm">
+        <div class="form-group">
+          <label for="fullName">Full Name</label>
+          <input type="text" id="fullName" name="fullName" required placeholder="Your name">
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" required placeholder="your@email.com">
+        </div>
+
+        <div class="form-group">
+          <button type="submit" class="btn">Register as Instructor</button>
+        </div>
+      </form>
+
+      <div id="successAlert" class="alert alert-success" style="display: none;">
+        <strong>Success!</strong> Your registration has been submitted. Your instructor ID is: <span id="instructorId"></span>
+      </div>
+
+      <div id="errorAlert" class="alert alert-danger" style="display: none;">
+        <strong>Error:</strong> <span id="errorMessage"></span>
+      </div>
+    </div>
+
+    <!-- Status Checker Section -->
+    <div class="section" style="max-width: 500px; margin: 30px auto;">
+      <h2>Check Registration Status</h2>
+      <p>Already registered? Enter your instructor ID to check your approval status.</p>
+
+      <div class="form-group">
+        <label for="statusId">Instructor ID</label>
+        <input type="text" id="statusId" placeholder="Enter your ID" />
+      </div>
+
+      <button class="btn btn-secondary" onclick="checkStatus()">Check Status</button>
+
+      <div id="statusResult" class="card" style="display: none; margin-top: 20px;">
+        <p><strong>Status:</strong> <span id="statusBadge"></span></p>
+        <p id="statusMessage"></p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2025 HungryBird Course Management. Made with care.</p>
+  </footer>
+
+  <script>
+    // handle registration form submission
+    document.getElementById('registrationForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById('fullName').value;
+      const email = document.getElementById('email').value;
+
+      try {
+        const response = await fetch('http://localhost:5000/instructor/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email })
+        });
+
+        const result = await response.json();
+        console.log('Registration response:', result);
+
+        if (result.success) {
+          document.getElementById('successAlert').style.display = 'block';
+          document.getElementById('errorAlert').style.display = 'none';
+          document.getElementById('instructorId').textContent = result.data.id;
+          
+          // save instructor id to local storage
+          localStorage.setItem('instructorId', result.data.id);
+          
+          document.getElementById('registrationForm').reset();
+        } else {
+          document.getElementById('errorAlert').style.display = 'block';
+          document.getElementById('successAlert').style.display = 'none';
+          document.getElementById('errorMessage').textContent = result.message || 'Registration failed';
+        }
+      } catch (error) {
+        console.error('Error during registration:', error);
+        document.getElementById('errorAlert').style.display = 'block';
+        document.getElementById('errorMessage').textContent = 'Network error. Please try again.';
+      }
+    });
+
+    // check instructor status
+    async function checkStatus() {
+      const instructorId = document.getElementById('statusId').value;
+      
+      if (!instructorId) {
+        alert('Please enter an instructor ID');
+        return;
+      }
+
+      try {
+        const response = await fetch(`http://localhost:5000/instructor/status/${instructorId}`);
+        const result = await response.json();
+        console.log('Status response:', result);
+
+        if (result.success && result.data) {
+          const status = result.data.status;
+          const statusBadge = document.getElementById('statusBadge');
+          
+          statusBadge.className = `badge ${status}`;
+          statusBadge.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+          
+          const statusMsg = status === 'approved' 
+            ? 'Congratulations! You are approved to create courses.'
+            : 'Your application is under review. Please check back soon.';
+          
+          document.getElementById('statusMessage').textContent = statusMsg;
+          document.getElementById('statusResult').style.display = 'block';
+        } else {
+          alert('Instructor not found');
+        }
+      } catch (error) {
+        console.error('Error checking status:', error);
+        alert('Error checking status. Please try again.');
+      }
+    }
+
+    // load saved instructor id if exists
+    document.addEventListener('DOMContentLoaded', () => {
+      const savedId = localStorage.getItem('instructorId');
+      if (savedId) {
+        document.getElementById('statusId').value = savedId;
+      }
+    });
+  </script>
+</body>
+</html>

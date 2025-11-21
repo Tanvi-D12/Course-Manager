@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HungryBird - Course Management</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>HungryBird</h1>
+      <nav>
+        <a href="index.html">Courses</a>
+        <a href="instructor-register.html">Instructor</a>
+        <a href="admin.html">Admin</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Hero Section -->
+    <div class="hero-section">
+      <div class="hero-content">
+        <h2 class="hero-quote">"Educate a child, build a nation."</h2>
+        <!-- Features on Hero -->
+        <div class="hero-features">
+          <div class="hero-feature">
+            <h4>Expert Instructors</h4>
+            <p>Learn from experienced educators</p>
+          </div>
+          <div class="hero-feature">
+            <h4>Quality Content</h4>
+            <p>Carefully curated courses</p>
+          </div>
+          <div class="hero-feature">
+            <h4>Flexible Learning</h4>
+            <p>Learn at your own pace</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Courses Section -->
+    <div class="section" id="coursesSection">
+      <h2>Available Courses</h2>
+      <div id="loadingSpinner" class="loading" style="display: none;">
+        <div class="spinner"></div>
+      </div>
+      <div id="coursesContainer" class="list-container"></div>
+      <div id="emptyState" class="empty-state" style="display: none;">
+        <p>No courses available yet. Check back soon!</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2025 HungryBird Course Management. Made with care.</p>
+  </footer>
+
+  <script>
+    // get all courses and display them
+    async function loadCourses() {
+      const spinner = document.getElementById('loadingSpinner');
+      const container = document.getElementById('coursesContainer');
+      const emptyState = document.getElementById('emptyState');
+
+      spinner.style.display = 'block';
+      container.innerHTML = '';
+
+      try {
+        const response = await fetch('http://localhost:5000/courses');
+        const result = await response.json();
+
+        if (result.success && result.data.length > 0) {
+          result.data.forEach(course => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+              <h3>${course.name}</h3>
+              <p><strong>Instructor:</strong> ${course.Instructor?.name || 'TBD'}</p>
+              <p><strong>Email:</strong> ${course.Instructor?.email || 'N/A'}</p>
+            `;
+            card.style.cursor = 'pointer';
+            card.addEventListener('click', () => {
+              window.location.href = `course-details.html?id=${course.id}`;
+            });
+            container.appendChild(card);
+          });
+          emptyState.style.display = 'none';
+        } else {
+          emptyState.style.display = 'block';
+        }
+      } catch (error) {
+        console.error('Error loading courses:', error);
+        emptyState.style.display = 'block';
+        emptyState.innerHTML = '<p>Error loading courses. Please try again.</p>';
+      } finally {
+        spinner.style.display = 'none';
+      }
+    }
+
+    // load courses when page loads
+    document.addEventListener('DOMContentLoaded', loadCourses);
+  </script>
+</body>
+</html>
